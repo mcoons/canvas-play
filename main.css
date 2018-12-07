@@ -1,0 +1,16 @@
+canvas {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 1px solid red;
+}
+
+#colorsource, #colorwheel{
+    display:none;
+}
+
+#background {
+    position: absolute;
+    z-index: -55;
+}
+
