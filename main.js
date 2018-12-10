@@ -1,15 +1,20 @@
 let width = 800;
 let halfWidth = Math.floor(width / 2);
+
+let colorTheta = 0;
+let index = 0;
+// let x, y, j;
+
 let palette = [];
 buildPalette();
+
+let backgroundInterval = null;
 
 ////////////////////////////////////////////////////////
 
 let background = document.getElementById("background");
-background.width = width;
-background.height = width;
-background.style.width = width;
-background.style.height = width;
+background.width = background.height = width;
+background.style.width = background.style.height = width;
 
 let backCtx = background.getContext("2d");
 backCtx.translate(halfWidth,halfWidth);
@@ -17,33 +22,25 @@ backCtx.translate(halfWidth,halfWidth);
 backCtx.fillStyle = "#000000";
 backCtx.fillRect(-halfWidth,-halfWidth,width,width);
 
-let colorTheta = 0;
-let index = 0;
-
 ////////////////////////////////////////////////////////
 
 let canvas = document.getElementById("canvas1");
-canvas.width = width;
-canvas.height = width;
-canvas.style.width = width;
-canvas.style.height = width;
+canvas.width = canvas.height = width;
+canvas.style.width = canvas.style.height = width;
 
-let x, y, j;
 let ctx = canvas.getContext("2d");
-
 ctx.translate(halfWidth, halfWidth);
+
 clear(ctx);
 
 //////////////////////////////////////////////////////////////////////
 
-let showBackground = true;
+let showBackground = false;
 let showTrig = true;
 let showCircles = false;
 let showCircles2 = false;
 let showCircles3 = false;
 let showKoch = false;
-
-let backgroundInterval = null;
 
 if (showBackground) backgroundInterval = scrollingBackground();
 if (showTrig) trig();
@@ -63,15 +60,15 @@ function trig() {
   ctx.fillStyle = "#FFFFFF";
   drawText(ctx, 5, -6, "(0,0)", "12px serif");
 
-  for (x = -Math.PI; x < Math.PI; x += 0.001) {
-    j = width / (2 * Math.PI);
+  for (let x = -Math.PI; x < Math.PI; x += 0.001) {
+    let j = width / (2 * Math.PI);
 
     ctx.fillStyle = "#FFFFFF";
     drawPoint(ctx, x * j * 4, 0);
     drawPoint(ctx, 0, x * j * 4);
 
     ctx.fillStyle = "#0000FF";
-    y = Math.sin(x * 3);
+    let y = Math.sin(x * 3);
     drawPoint(ctx, x * j, (y * halfWidth) / 3);
 
     ctx.fillStyle = "#00FF00";
@@ -203,16 +200,17 @@ function clear(ctx) {
 }
 
 // index:   into color palette
-// percent:  -1 = black, 1 = white
+// percent: -1 = black bias, 0 = actual, 1 = white bias
 function getColor(index, percent){   
   let color = palette[index].color;
   let newColor = shadeRGBColor(color, percent); 
   return newColor;
 }
 
-// percent:  -1 = black, 1 = white
+// color:   rgb color 
+// percent: -1 = black bias, 0 = actual, 1 = white bias
 function shadeRGBColor(color, percent) {
-  var f=color.split(","),
+  let f=color.split(","),
       t=percent<0?0:255,
       p=percent<0?percent*-1:percent,
       R=parseInt(f[0].slice(4)),
@@ -255,57 +253,11 @@ function buildPalette(){
 ////////////////////////////////////////////////////////
 
 function scrollingBackground(){
-  // const image = document.getElementById('colorsource');
 
-  // let colorwheel = document.getElementById("colorwheel")
-  // colorwheel.width = 100;
-  // colorwheel.height = 100;
-  // colorwheel.style.width = 100;
-  // colorwheel.style.height = 100;
-
-  // let colorCtx = colorwheel.getContext("2d");
-  // colorCtx.translate(50,50);
-  // colorCtx.drawImage(image, -50, -50, 100, 100);
-
-  // let interval = setInterval(scrollColors, 20, backCtx);
-  let interval = setInterval(scrollColors2, 20, backCtx, -.75);
+  let interval = setInterval(scrollColors, 20, backCtx, -.75);
   return interval;
 
-  // function scrollColors(ctx) {
-  //     colorX = Math.cos(colorTheta)*40;
-  //     colorY = Math.sin(colorTheta)*40;
-      
-  //     color2X = Math.cos(colorTheta+2*Math.PI/3)*40;
-  //     color2Y = Math.sin(colorTheta+2*Math.PI/3)*40;
-      
-  //     color3X = Math.cos(colorTheta+4*Math.PI/3)*40;
-  //     color3Y = Math.sin(colorTheta+4*Math.PI/3)*40;
-
-  //     let bColor = colorCtx.getImageData(colorX+50, colorY+50, 1, 1).data;
-  //     var hex = "#" + ("000000" + rgbToHex(bColor[0]/4, bColor[1]/4, bColor[2]/2)).slice(-6);
-      
-  //     let bColor2 = colorCtx.getImageData(color2X+50, color2Y+50, 1, 1).data;
-  //     var hex2 = "#" + ("000000" + rgbToHex(bColor2[0]/4, bColor2[1]/4, bColor2[2]/2)).slice(-6);
-      
-  //     let bColor3 = colorCtx.getImageData(color3X+50, color3Y+50, 1, 1).data;
-  //     var hex3 = "#" + ("000000" + rgbToHex(bColor3[0]/4, bColor3[1]/4, bColor3[2]/2)).slice(-6);
-
-  //     let gradient =ctx.createRadialGradient(0,0,75, 0,0,width/1.5);
-
-  //     // Add three color stops
-  //     gradient.addColorStop(0, hex);
-  //     gradient.addColorStop(.3, hex2);
-  //     gradient.addColorStop(.9, hex3);
-
-  //     // Set the fill style and draw a rectangle
-  //     ctx.fillStyle = gradient;
-  //     ctx.fillRect(-halfWidth, -halfWidth, width, width);
-
-  //     colorTheta += .005;
-  //     if (colorTheta >= 2*Math.PI) colorTheta = 0;
-  // }
-
-  function scrollColors2(ctx, percent){
+  function scrollColors(ctx, percent){
     bColor1 = getColor( index%1530, percent);
     // bColor2 = getColor( (index+255)%1530, percent);
     bColor3 = getColor( (index+510)%1530, percent);
@@ -313,7 +265,7 @@ function scrollingBackground(){
     bColor5 = getColor( (index+1020)%1530, percent);
     // bColor6 = getColor( (index+1275)%1530, percent);
 
-    let gradient =ctx.createRadialGradient(0,0,width/20, 0,0,width/1.5);
+    let gradient = ctx.createRadialGradient(0,0,width/20, 0,0,width/1.5);
 
     // Add three color stops
     gradient.addColorStop(0,  bColor1);
@@ -333,7 +285,7 @@ function scrollingBackground(){
 
 
 ///////////////////////////
-// Properties
+// Canvas 2D Properties
 ///////////////////////////
 
 // canvas
@@ -355,7 +307,7 @@ function scrollingBackground(){
 // textBaseline
 
 ///////////////////////////
-// Methods
+// Canvas 2D Methods
 ///////////////////////////
 
 // arc()
