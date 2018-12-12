@@ -1,41 +1,40 @@
-let width = 800;
-let halfWidth = Math.floor(width / 2);
+let background = document.getElementById("background");
+let backCtx = background.getContext("2d");
 
-let colorTheta = 0;
+let canvas = document.getElementById("canvas1");
+let ctx = canvas.getContext("2d");
+
+document.body.setAttribute("onresize","resizeCanvas()");
+
+////////////////////////////////////////////////////////
+
+// let width = 1200;
+// let height = 800;
+let width = window.innerWidth;
+let height = window.innerHeight;
+let halfWidth = Math.floor(width / 2);
+let halfHeight = Math.floor(height / 2);
+var viewportWidth = window.innerWidth;
+var viewportHeight = window.innerHeight;
+let wide = width > height ? true : false;
+
+let colorTheta = 1530;
 let index = 0;
+let inc = 10000;
+let zoom = 1;
+
+let x,y,r;
+let scale = halfWidth/6;
+var a=2,b=2,c=640;
+
 // let x, y, j;
+
+
+let backgroundInterval = null;
+let parainterval = null;
 
 let palette = [];
 buildPalette();
-
-let backgroundInterval = null;
-
-////////////////////////////////////////////////////////
-
-let background = document.getElementById("background");
-background.width = background.height = width;
-background.style.width = background.style.height = width;
-background.style.left = `${halfWidth}px`;
-
-let backCtx = background.getContext("2d");
-backCtx.translate(halfWidth,halfWidth);
-
-backCtx.fillStyle = "#000000";
-backCtx.fillRect(-halfWidth,-halfWidth,width,width);
-
-////////////////////////////////////////////////////////
-
-let canvas = document.getElementById("canvas1");
-canvas.width = canvas.height = width;
-canvas.style.width = canvas.style.height = width;
-canvas.style.left = `${halfWidth}px`;
-
-let ctx = canvas.getContext("2d");
-ctx.translate(halfWidth, halfWidth);
-
-clear(ctx);
-
-//////////////////////////////////////////////////////////////////////
 
 let showBackground = true;
 let showTrig = false;
@@ -43,13 +42,74 @@ let showCircles = false;
 let showCircles2 = false;
 let showCircles3 = false;
 let showKoch = false;
+let showParametric = true;
 
-if (showBackground) backgroundInterval = scrollingBackground();
-if (showTrig) trig();
-if (showCircles) circles(0, 0, (width-1)/4, 5);
-if (showCircles2) circles2(0, 0, (width-1)/5, 7, null);
-if (showCircles3) circles3(0, 0, (width - 1) / 6, 7, null);
-if (showKoch) koch();
+resizeCanvas();
+
+////////////////////////////////////////////////////////
+
+function resizeCanvas(){
+  width = window.innerWidth;
+  height = window.innerHeight;
+  halfWidth = Math.floor(width / 2);
+  halfHeight = Math.floor(height / 2);
+  viewportWidth = window.innerWidth;
+  viewportHeight = window.innerHeight;  
+  
+  wide = width > height ? true : false;
+
+  setBackground();
+  setCanvas();
+  refreshImages();
+}
+
+////////////////////////////////////////////////////////
+
+function setBackground(){
+  background.width = width;
+  background.height = height;
+  background.style.width = width;
+  background.style.height = height;
+  background.style.left = `${viewportWidth/2 - halfWidth}px`;
+  background.style.top = `${viewportHeight/2 - halfHeight}px`;
+
+
+  backCtx.translate(halfWidth,halfHeight);
+
+  backCtx.fillStyle = "#000000";
+  backCtx.fillRect(-halfWidth,-halfHeight,width,height);
+
+}
+////////////////////////////////////////////////////////
+
+function setCanvas(){
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.width = width;
+  canvas.style.height = height;
+  canvas.style.left = `${viewportWidth/2 - halfWidth}px`;
+  canvas.style.top = `${viewportHeight/2 - halfHeight}px`;
+
+  ctx.translate(halfWidth, halfHeight);
+
+  clear(ctx);
+}
+//////////////////////////////////////////////////////////////////////
+
+
+
+function refreshImages(){
+  if (showParametric) parametric(inc);
+  if (showBackground) {
+    clearInterval(backgroundInterval);
+    backgroundInterval = scrollingBackground();
+  }
+  if (showTrig) trig();
+  if (showCircles) circles(0, 0, (width-1)/4, 5);
+  if (showCircles2) circles2(0, 0, (width-1)/5, 7, null);
+  if (showCircles3) circles3(0, 0, (width - 1) / 6, 7, null);
+  if (showKoch) koch();
+}
 
 //////////////////////////////////////////////////////////////////////
 
@@ -71,11 +131,11 @@ function trig() {
 
     ctx.fillStyle = "#0000FF";
     let y = Math.sin(x * 3);
-    drawPoint(ctx, x * j, (y * halfWidth) / 3);
+    drawPoint(ctx, x * j, (y * halfHeight) / 3);
 
     ctx.fillStyle = "#00FF00";
     y = Math.cos(x * 3);
-    drawPoint(ctx, x * j, (y * halfWidth) / 3);
+    drawPoint(ctx, x * j, (y * halfHeight) / 3);
   }
 }
 
@@ -123,8 +183,10 @@ function circles3(x, y, r, i, dir) {
 function koch() {
   ctx.strokeStyle = "#99FFFF";
 
+  let w = wide ? height : width;
+
   for (let r = 2.2; r <= 80; r *= 1.34) {
-    let radius = width / r;
+    let radius = w / r;
 
     let rad = (90 * Math.PI) / 180;
     let x1 = Math.cos(rad) * radius;
@@ -173,112 +235,132 @@ function kochCurve(p1x, p1y, p2x, p2y, i) {
 }
 
 //////////////////////////////////////////////////////////////////////
-let inc = .0002;
 
-parametric1(inc);
+// parametric(inc);
 
-function parametric1(inc){
+function parametric(inc){
   ctx.fillStyle = "#FFFFFF";
-  let x,y,r;
-  let scale = halfWidth/6;
-  var a=2,b=2,c=640;
+  // let x,y,r;
+  // let scale = halfWidth/6;
+  // var a=2,b=2,c=640;
     
-  var formulatext = document.createElement('label');
-  formulatext.innerText = "r = A + B * cos(C * theta)";
-  document.getElementById('form').appendChild(formulatext);
+  // var formulatext = document.createElement('label');
+  // formulatext.innerText = "r = A + B * cos(C * theta)";
+  // document.getElementById('form').appendChild(formulatext);
 
-  var aslider = document.createElement('input');
-  aslider.id = "aValue";
-  aslider.type = 'range';
-  aslider.min = 0;
-  aslider.max = 10;
-  aslider.value = 2;
-  aslider.step = 1;
-  aslider.oninput = function(){atext.innerText = "Value of A: " + aslider.value; submit.onclick()}
-  document.getElementById('form').appendChild(aslider);
+  var aslider = document.getElementById('aValue');
+  var atext = document.getElementById('aText');
+  // aslider.id = "aValue";
+  // aslider.type = 'range';
+  // aslider.min = 0;
+  // aslider.max = 10;
+  aslider.value = a;
+  // aslider.step = 1;
+  aslider.oninput = function(){atext.innerText = "Value of A: " + aslider.value; update()}
+  // document.getElementById('form').appendChild(aslider);
+  atext.innerText = "Value of A: " + aslider.value;
+  // var atext = document.createElement('label');
+  // atext.innerText = "Value of A: "+a;
+  // document.getElementById('form').appendChild(atext);
 
-  var atext = document.createElement('label');
-  atext.innerText = "Value of A: 2";
-  document.getElementById('form').appendChild(atext);
+  var bslider = document.getElementById('bValue');
+  var btext = document.getElementById('bText');
+  // bslider.id = "bValue";
+  // bslider.type = 'range';
+  // bslider.min = 0;
+  // bslider.max = 10;
+  bslider.value = b;
+  // bslider.step = 1;
+  bslider.oninput = function(){btext.innerText = "Value of B: " + bslider.value; update()}
+  // document.getElementById('form').appendChild(bslider);
+  btext.innerText = "Value of B: " + bslider.value;
+  // var btext = document.createElement('label');
+  // btext.innerText = "Value of B: "+b;
+  // document.getElementById('form').appendChild(btext);
 
-  var bslider = document.createElement('input');
-  bslider.id = "bValue";
-  bslider.type = 'range';
-  bslider.min = 1;
-  bslider.max = 10;
-  bslider.value = 2;
-  bslider.step = 1;
-  bslider.oninput = function(){btext.innerText = "Value of B: " + bslider.value; submit.onclick()}
-  document.getElementById('form').appendChild(bslider);
-  
-  var btext = document.createElement('label');
-  btext.innerText = "Value of B: 2";
-  document.getElementById('form').appendChild(btext);
+  var cslider = document.getElementById('cValue');
+  var ctext = document.getElementById('cText');
+  // cslider.id = "cValue";
+  // cslider.type = 'range';
+  // cslider.min = 1;
+  // cslider.max = 1000;
+  cslider.value = c;
+  // cslider.step = 1;
+  cslider.oninput = function(){ctext.innerText = "Value of C: " + cslider.value; update()}
+  // document.getElementById('form').appendChild(cslider);
+  ctext.innerText = "Value of C: " + cslider.value;
+  // var ctext = document.createElement('label');
+  // ctext.innerText = "Value of C: "+c;
+  // document.getElementById('form').appendChild(ctext);
 
-  var cslider = document.createElement('input');
-  cslider.id = "cValue";
-  cslider.type = 'range';
-  cslider.min = 1;
-  cslider.max = 1000;
-  cslider.value = 640;
-  cslider.step = 1;
-  cslider.oninput = function(){ctext.innerText = "Value of C: " + cslider.value; submit.onclick()}
-  document.getElementById('form').appendChild(cslider);
-  
-  var ctext = document.createElement('label');
-  ctext.innerText = "Value of C: 640";
-  document.getElementById('form').appendChild(ctext);
+  var islider = document.getElementById('iValue');
+  var itext = document.getElementById('iText');
+  // islider.id = "iValue";
+  // islider.type = 'range';
+  // islider.min = 100;
+  // islider.max = 100000;
+  islider.value = inc;
+  // islider.step = 1;
+  islider.oninput = function(){itext.innerText = "Value of theta step: (" + islider.value + ") " + Math.PI/islider.value; update()}
+  // document.getElementById('form').appendChild(islider);
+  itext.innerText = "Value of theta step: (" + islider.value + ") " + Math.PI/islider.value;
+  // var itext = document.createElement('label');
+  // itext.innerText = "Value of theta step: "+Math.PI/islider.value;
+  // document.getElementById('form').appendChild(itext);
 
-  var islider = document.createElement('input');
-  islider.id = "iValue";
-  islider.type = 'range';
-  islider.min = 1;
-  islider.max = 100;
-  islider.value = 20;
-  islider.step = 1;
-  islider.oninput = function(){itext.innerText = "Value of theta inc: " + islider.value/100000; submit.onclick()}
-  document.getElementById('form').appendChild(islider);
-  
-  var itext = document.createElement('label');
-  itext.innerText = "Value of theta inc: .02";
-  document.getElementById('form').appendChild(itext);
-
-
-
-
-
-  var submit = document.createElement('button');
-  submit.type = "button";
-  submit.innerText = "Submit";
-  submit.onclick = function(){console.log("clicked"); 
-                              a=Number(aslider.value); 
-                              b=Number(bslider.value); 
-                              c=Number(cslider.value); 
-                              inc = Number(islider.value/100000);
-                              drawParametric(a,b,c); }
-  document.getElementById('form').appendChild(submit);
+  var zslider = document.getElementById('zValue');
+  var ztext = document.getElementById('zText');
+  // zslider.id = "zValue";
+  // zslider.type = 'range';
+  // zslider.min = 1;
+  // zslider.max = 100;
+  zslider.value = zoom*10;
+  // zslider.step = 1;
+  zslider.oninput = function(){ztext.innerText = "Value of zoom: " + zslider.value/10; update()}
+  // document.getElementById('form').appendChild(zslider);
+  ztext.innerText = "Value of zoom: " + zslider.value/10;
+  // var ztext = document.createElement('label');
+  // ztext.innerText = "Value of zoom: "+zoom;
+  // document.getElementById('form').appendChild(ztext);
 
 
-  drawParametric(a,b,c);
+  function update(){  a=Number(aslider.value); 
+                      b=Number(bslider.value); 
+                      c=Number(cslider.value); 
+                      inc = Number(islider.value);
+                      zoom = Number(zslider.value/10);
+                      // drawParametric(a,b,c); 
+                    }
 
-  function drawParametric(a,b,c){
+
+  clearInterval(parainterval);
+  parainterval = setInterval( drawParametric, 100);
+
+  function drawParametric(){
     clear(ctx);
+    ctx.save();
 
+    ctx.scale(zoom,zoom);
     // console.log("a",a);
     // console.log("b",b);
     // console.log("c",c);
 
 
-    for (let theta = 0; theta < 2*Math.PI; theta+=inc){
-      r = (a+b*Math.cos(c*theta));
+    for (let theta = 0; theta <= 2*Math.PI; theta+=Math.PI/inc){
+      r = (a+b*Math.sin(c*theta));
       ctx.fillStyle = 'red';
       // console.log("r",r)
       // console.log("palette", palette)
-      ctx.fillStyle = palette[Math.abs(Math.round(265*r)%1529)].color;
+      ctx.fillStyle = palette[(Math.abs(Math.round(265*r)+colorTheta)%1530)].color;
       x = Math.cos(theta+Math.PI/4)*r*scale;
       y = Math.sin(theta+Math.PI/4)*r*scale;
-      drawPoint(ctx, x, y);
+      drawPoint(ctx, x, y, 1);
     }
+
+    ctx.restore();
+
+    colorTheta-=2;
+    if (colorTheta < 0) colorTheta = 1530;
   }
 
 }
@@ -296,8 +378,8 @@ function drawCircle(ctx, cx, cy, radius, color) {
   ctx.stroke();
 }
 
-function drawPoint(ctx, x, y) {
-  ctx.fillRect(x, y, 1, 1);
+function drawPoint(ctx, x, y, width=1) {
+  ctx.fillRect(x-width/2, y-width/2, width, width);
 }
 
 function drawCenteredText(ctx, x, y, txt, font) {
@@ -313,7 +395,7 @@ function drawText(ctx, x, y, txt, font) {
 }
 
 function clear(ctx) {
-  ctx.clearRect(-halfWidth, -halfWidth, width, width);
+  ctx.clearRect(-halfWidth, -halfHeight, width, height);
 }
 
 // index:   into color palette
@@ -366,14 +448,14 @@ function buildPalette(){
   for (b=254; b>0; b--){ palette.push({r,g,b,color:`rgb(${r},${g},${b})`});}
   b++;
 
-  console.log(palette);
+  // console.log(palette);
 }
 
 ////////////////////////////////////////////////////////
 
 function scrollingBackground(){
 
-  let interval = setInterval(scrollColors, 20, backCtx, -.55);
+  let interval = setInterval(scrollColors, 20, backCtx, -.75);
   return interval;
 
   function scrollColors(ctx, percent){
@@ -395,9 +477,9 @@ function scrollingBackground(){
     // gradient.addColorStop(1,  bColor6);
 
     ctx.fillStyle = gradient;
-    ctx.fillRect(-halfWidth, -halfWidth, width, width);
+    ctx.fillRect(-halfWidth, -halfHeight, width, height);
 
-    index++;
+    index+=2;
     index = index%1530;
   }
 }
@@ -456,10 +538,10 @@ function scrollingBackground(){
 // putImageData()
 // quadraticCurveTo()
 // rect()
-// restore()
+// restore() **
 // rotate()
-// save()
-// scale()
+// save() **
+// scale() **
 // setLineDash()
 // setTransform()
 // stroke() **

@@ -12,7 +12,7 @@ canvas {
     position: absolute;
     margin: 0;
     padding: 0;
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 
 #background {
@@ -21,19 +21,20 @@ canvas {
 }
 
 form {
+    position: absolute;
     background-color: lightblue;
     width: 190px;
     padding: 10px;
+    z-index: 65;
 }
 
 input, label, button {
     position: relative;
     display:block;
-    z-index: 65;
 }
 
 label {
-    margin-bottom: 5px;
+    margin-bottom: 15px;
 }
 
 #container{
