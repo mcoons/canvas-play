@@ -1,4 +1,14 @@
+/* html, body, #wrapper {
+    height:100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+ } */
+ 
+
 canvas {
+    /* display:inline-block; */
     position: absolute;
     margin: 0;
     padding: 0;
@@ -6,6 +16,28 @@ canvas {
 }
 
 #background {
-    position: absolute;
+    /* position: absolute; */
     z-index: -55;
+}
+
+form {
+    background-color: lightblue;
+    width: 190px;
+    padding: 10px;
+}
+
+input, label, button {
+    position: relative;
+    display:block;
+    z-index: 65;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+#container{
+    /* align-content: center; */
+    text-align: center;
+    /* margin: auto; */
 }

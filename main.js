@@ -15,6 +15,7 @@ let backgroundInterval = null;
 let background = document.getElementById("background");
 background.width = background.height = width;
 background.style.width = background.style.height = width;
+background.style.left = `${halfWidth}px`;
 
 let backCtx = background.getContext("2d");
 backCtx.translate(halfWidth,halfWidth);
@@ -27,6 +28,7 @@ backCtx.fillRect(-halfWidth,-halfWidth,width,width);
 let canvas = document.getElementById("canvas1");
 canvas.width = canvas.height = width;
 canvas.style.width = canvas.style.height = width;
+canvas.style.left = `${halfWidth}px`;
 
 let ctx = canvas.getContext("2d");
 ctx.translate(halfWidth, halfWidth);
@@ -35,8 +37,8 @@ clear(ctx);
 
 //////////////////////////////////////////////////////////////////////
 
-let showBackground = false;
-let showTrig = true;
+let showBackground = true;
+let showTrig = false;
 let showCircles = false;
 let showCircles2 = false;
 let showCircles3 = false;
@@ -171,6 +173,121 @@ function kochCurve(p1x, p1y, p2x, p2y, i) {
 }
 
 //////////////////////////////////////////////////////////////////////
+let inc = .0002;
+
+parametric1(inc);
+
+function parametric1(inc){
+  ctx.fillStyle = "#FFFFFF";
+  let x,y,r;
+  let scale = halfWidth/6;
+  var a=2,b=2,c=640;
+    
+  var formulatext = document.createElement('label');
+  formulatext.innerText = "r = A + B * cos(C * theta)";
+  document.getElementById('form').appendChild(formulatext);
+
+  var aslider = document.createElement('input');
+  aslider.id = "aValue";
+  aslider.type = 'range';
+  aslider.min = 0;
+  aslider.max = 10;
+  aslider.value = 2;
+  aslider.step = 1;
+  aslider.oninput = function(){atext.innerText = "Value of A: " + aslider.value; submit.onclick()}
+  document.getElementById('form').appendChild(aslider);
+
+  var atext = document.createElement('label');
+  atext.innerText = "Value of A: 2";
+  document.getElementById('form').appendChild(atext);
+
+  var bslider = document.createElement('input');
+  bslider.id = "bValue";
+  bslider.type = 'range';
+  bslider.min = 1;
+  bslider.max = 10;
+  bslider.value = 2;
+  bslider.step = 1;
+  bslider.oninput = function(){btext.innerText = "Value of B: " + bslider.value; submit.onclick()}
+  document.getElementById('form').appendChild(bslider);
+  
+  var btext = document.createElement('label');
+  btext.innerText = "Value of B: 2";
+  document.getElementById('form').appendChild(btext);
+
+  var cslider = document.createElement('input');
+  cslider.id = "cValue";
+  cslider.type = 'range';
+  cslider.min = 1;
+  cslider.max = 1000;
+  cslider.value = 640;
+  cslider.step = 1;
+  cslider.oninput = function(){ctext.innerText = "Value of C: " + cslider.value; submit.onclick()}
+  document.getElementById('form').appendChild(cslider);
+  
+  var ctext = document.createElement('label');
+  ctext.innerText = "Value of C: 640";
+  document.getElementById('form').appendChild(ctext);
+
+  var islider = document.createElement('input');
+  islider.id = "iValue";
+  islider.type = 'range';
+  islider.min = 1;
+  islider.max = 100;
+  islider.value = 20;
+  islider.step = 1;
+  islider.oninput = function(){itext.innerText = "Value of theta inc: " + islider.value/100000; submit.onclick()}
+  document.getElementById('form').appendChild(islider);
+  
+  var itext = document.createElement('label');
+  itext.innerText = "Value of theta inc: .02";
+  document.getElementById('form').appendChild(itext);
+
+
+
+
+
+  var submit = document.createElement('button');
+  submit.type = "button";
+  submit.innerText = "Submit";
+  submit.onclick = function(){console.log("clicked"); 
+                              a=Number(aslider.value); 
+                              b=Number(bslider.value); 
+                              c=Number(cslider.value); 
+                              inc = Number(islider.value/100000);
+                              drawParametric(a,b,c); }
+  document.getElementById('form').appendChild(submit);
+
+
+  drawParametric(a,b,c);
+
+  function drawParametric(a,b,c){
+    clear(ctx);
+
+    // console.log("a",a);
+    // console.log("b",b);
+    // console.log("c",c);
+
+
+    for (let theta = 0; theta < 2*Math.PI; theta+=inc){
+      r = (a+b*Math.cos(c*theta));
+      ctx.fillStyle = 'red';
+      // console.log("r",r)
+      // console.log("palette", palette)
+      ctx.fillStyle = palette[Math.abs(Math.round(265*r)%1529)].color;
+      x = Math.cos(theta+Math.PI/4)*r*scale;
+      y = Math.sin(theta+Math.PI/4)*r*scale;
+      drawPoint(ctx, x, y);
+    }
+  }
+
+}
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 function drawCircle(ctx, cx, cy, radius, color) {
   ctx.strokeStyle = color;
@@ -202,7 +319,7 @@ function clear(ctx) {
 // index:   into color palette
 // percent: -1 = black bias, 0 = actual, 1 = white bias
 function getColor(index, percent){   
-  let color = palette[index].color;
+  let color = palette[index%1530].color;
   let newColor = shadeRGBColor(color, percent); 
   return newColor;
 }
@@ -248,13 +365,15 @@ function buildPalette(){
 
   for (b=254; b>0; b--){ palette.push({r,g,b,color:`rgb(${r},${g},${b})`});}
   b++;
+
+  console.log(palette);
 }
 
 ////////////////////////////////////////////////////////
 
 function scrollingBackground(){
 
-  let interval = setInterval(scrollColors, 20, backCtx, -.75);
+  let interval = setInterval(scrollColors, 20, backCtx, -.55);
   return interval;
 
   function scrollColors(ctx, percent){
